@@ -1,70 +1,70 @@
-def add_rule(non_terminal, grammar):
-    # Add two production rules for a given non-terminal
-    for i in range(1, 3):
-        production = input(f"Enter rule number {i} for non-terminal '{non_terminal}': ")
-        grammar.setdefault(non_terminal, []).append(production)
+def addGrammer():
+    grammar = { 'S': [], 'B': [] }
+
+    for non_terminal, rules in grammar.items():
+        for i in range(1, 3):
+            rule = input(f"Enter rule number {i} for non-terminal '{non_terminal}': ")
+            rules.append(rule)
+
+    return grammar
+
 
 def is_simple_grammar(grammar):
-    # Check for epsilon productions
-    for productions in grammar.values():
-        if '' in productions:
+    for rules in grammar.values():
+        # Check for epsilon
+        if '' in rules:
             return False
-
-    # Check for disjointness and correct form
-    for productions in grammar.values():
-        first_terminals = set()
-        for production in productions:
-            if not production or production[0].isupper():
+        
+        # Check for correct form
+        for rule in rules:
+            if rule[0].isupper():
                 return False
-            if production[0] in first_terminals:
-                return False
-            first_terminals.add(production[0])
+            
+        # Check for disjointness
+        if rules[0][0] == rules[1][0]:
+            return False
     return True
 
-def parser(grammar, text):
+
+def parser(grammar, string):
     stack = ['S']
-    text = list(text)
+    string = list(string)
     while stack:
-        top = stack.pop(0) 
+        top = stack.pop(0)
         if top.isupper():
             if top in grammar:
                 for rule in grammar[top]:
-                    if rule[0] == text[0]:
+                    if rule[0] == string[0]:
                         stack = list(rule) + stack
-                        break  
+                        break
                 else:
-                    return stack, text
+                    return stack, string
             else:
-                return stack, text
-        elif text and top == text[0]:
-            text.pop(0)
+                return stack, string
+        elif top == string[0]:
+            string.pop(0)
         else:
-            return stack, text
+            return stack, string
         
-        if (text == [] or stack == []):
-            return stack, text
+        if (string == [] or stack == []):
+            return stack, string
 
 
 def main():
     while True:
-        grammar = {}
-        non_terminals = ['S', 'B']
-
-        for non_terminal in non_terminals:
-            add_rule(non_terminal, grammar)
-
+        grammar = addGrammer()
+        
         if not is_simple_grammar(grammar):
             print("The Grammar isn't simple. Try again.")
             continue
 
         while True:
-            sequence = input("Enter the string you want to check: ")
-            if not sequence:
-                print("Invalid input. Sequence cannot be empty.")
+            string = input("Enter the string you want to check: ")
+            if not string:
+                print("Invalid input. String cannot be empty.")
                 continue
 
-
-            stack, unchecked = parser(grammar, sequence)
+            stack, unchecked = parser(grammar, string)
 
             print(f"Stack after finished: {stack}")
             print(f"The rest of unchecked string: {unchecked}")
@@ -82,6 +82,8 @@ def main():
 
             if choice == "1":
                 break
+            elif choice == "2":
+                continue
             elif choice == "3":
                 return
 
